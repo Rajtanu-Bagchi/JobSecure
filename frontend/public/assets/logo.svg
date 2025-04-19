@@ -1,0 +1,12 @@
+<svg width="200" height="50" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .logo-text { font-family: Arial, sans-serif; font-weight: bold; }
+    .job { fill: #ff6b00; }
+    .secure { fill: #ffffff; }
+    .shield { fill: #ff6b00; stroke: #ffffff; stroke-width: 1; }
+  </style>
+  <rect width="200" height="50" fill="#1a2e44" rx="5" ry="5"/>
+  <path class="shield" d="M30,10 L45,10 L45,25 C45,32 37.5,40 37.5,40 C37.5,40 30,32 30,25 L30,10 Z"/>
+  <text x="55" y="33" class="logo-text job">Job</text>
+  <text x="95" y="33" class="logo-text secure">Secure</text>
+</svg>
