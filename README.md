@@ -21,7 +21,7 @@ To create a trustworthy platform for freelancers by integrating:
 | Frontend | React.js, Redux, Tailwind CSS |
 | Backend | Node.js, Express.js |
 | Database | MongoDB (NoSQL) |
-| Authentication | JWT + bcrypt |
+| Authentication | JWT + Argon2 |
 | Email Verification | Nodemailer + Email OTP |
 | Payments (Simulated) | Stripe test API |
 | Scam Detection | Rule-based system |

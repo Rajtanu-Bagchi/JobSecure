@@ -98,7 +98,7 @@ npm start
 ## Security Features
 
 - JWT authentication
-- Password hashing with bcrypt
+- Password hashing with Argon2
 - Email verification
 - Role-based access control
 - Input validation

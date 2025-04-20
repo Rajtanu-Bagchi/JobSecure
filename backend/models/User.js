@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+const argon2 = require('argon2');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -58,9 +58,22 @@ UserSchema.pre('save', async function(next) {
     next();
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    // Argon2 recommended config for password hashing
+    // Type: argon2id (combines protection against side-channel attacks and GPU cracking)
+    // Memory: 65536 KiB (64 MB)
+    // Iterations: 3
+    // Parallelism: 4
+    this.password = await argon2.hash(this.password, {
+      type: argon2.argon2id,
+      memoryCost: 65536,
+      timeCost: 3,
+      parallelism: 4
+    });
+    next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 // Sign JWT and return
@@ -74,7 +87,7 @@ UserSchema.methods.getSignedJwtToken = function() {
 
 // Match user entered password to hashed password in database
 UserSchema.methods.matchPassword = async function(enteredPassword) {
-  return await bcrypt.compare(enteredPassword, this.password);
+  return await argon2.verify(this.password, enteredPassword);
 };
 
 // Generate and hash email verification token
