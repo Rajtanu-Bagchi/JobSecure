@@ -46,7 +46,7 @@ const Navbar = () => {
                 <div className="flex flex-shrink-0 items-center">
                   <Link to="/" className="flex items-center">
                     <img
-                      className="h-10 w-auto"
+                      className="h-14 w-auto"
                       src="/assets/logo.svg"
                       alt="JobSecure"
                     />

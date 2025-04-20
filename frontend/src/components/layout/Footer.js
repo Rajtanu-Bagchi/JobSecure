@@ -12,8 +12,8 @@ const Footer = () => {
           <div className="space-y-8 xl:col-span-1">
             <Link to="/" className="flex items-center">
               <img
-                className="h-10 w-auto"
-                src="/logo.png"
+                className="h-14 w-auto"
+                src="/assets/logo.svg"
                 alt="JobSecure"
               />
               <span className="ml-2 text-xl font-bold text-secondary-900 dark:text-white">JobSecure</span>
