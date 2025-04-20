@@ -11,9 +11,9 @@ const DashboardPage = () => {
   // Mock data for demonstration
   const stats = {
     totalJobs: 15,
-    activeJobs: 7,
+    activeJobs: 1,
     completedJobs: 8,
-    totalEarnings: '$4,500',
+    totalEarnings: '₹384,242',
     trustScore: '92%',
     verified: true,
     escrowEnabled: true,
@@ -64,13 +64,7 @@ const DashboardPage = () => {
                 Here's what's happening with your jobs today
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <Link
-                to="/profile"
-                className="btn-secondary"
-              >
-                Profile Settings
-              </Link>
+            <div className="flex items-center">
               <Link
                 to="/jobs"
                 className="btn-primary"
