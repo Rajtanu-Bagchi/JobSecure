@@ -1,9 +1,33 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { ShieldCheckIcon, UserGroupIcon, BanknotesIcon } from '@heroicons/react/24/outline';
 
 const ProfilePage = () => {
   const { user } = useSelector(state => state.auth);
+  console.log('User data in ProfilePage:', user);
+
+  // Mock data to match dashboard (same as in DashboardPage.js)
+  const stats = {
+    totalJobs: 15,
+    activeJobs: 1,
+    totalEarnings: '384,242',
+    trustScore: '92%',
+    verified: true,
+    escrowEnabled: true,
+  };
+
+  // Function to safely get user name
+  const getUserName = () => {
+    if (!user) return 'User';
+    // Try different possible locations for the name property
+    return user.name || (user.data && user.data.name) || 'User';
+  };
+
+  // Function to get first letter of name or default
+  const getInitial = () => {
+    const name = getUserName();
+    return name.charAt(0).toUpperCase();
+  };
 
   return (
     <div className="bg-gray-50 dark:bg-secondary-900 min-h-screen py-8">
@@ -25,21 +49,21 @@ const ProfilePage = () => {
                       className="h-full w-full rounded-full object-cover"
                     />
                   ) : (
-                    <span className="text-4xl">{user?.name?.charAt(0)?.toUpperCase()}</span>
+                    <span className="text-4xl">{getInitial()}</span>
                   )}
                 </div>
               </div>
               <div className="space-y-4">
                 <div>
                   <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">Personal Information</h3>
-                  <p className="mt-1 text-secondary-600 dark:text-secondary-400">{user?.name}</p>
-                  <p className="mt-1 text-secondary-600 dark:text-secondary-400">{user?.email}</p>
-                  <p className="mt-1 text-secondary-600 dark:text-secondary-400">{user?.phone}</p>
+                  <p className="mt-1 text-secondary-600 dark:text-secondary-400">{getUserName()}</p>
+                  <p className="mt-1 text-secondary-600 dark:text-secondary-400">{user?.email || (user?.data && user.data.email) || ''}</p>
+                  <p className="mt-1 text-secondary-600 dark:text-secondary-400">{user?.phone || (user?.data && user.data.phone) || ''}</p>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">Account Type</h3>
                   <p className="mt-1 text-secondary-600 dark:text-secondary-400 capitalize">
-                    {user?.role}
+                    {user?.userType || (user?.data && user.data.userType) || 'freelancer'}
                   </p>
                 </div>
               </div>
@@ -55,7 +79,7 @@ const ProfilePage = () => {
                       Total Jobs
                     </p>
                     <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                      {user?.totalJobs || 0}
+                      {stats.totalJobs}
                     </p>
                   </div>
                 </div>
@@ -68,7 +92,7 @@ const ProfilePage = () => {
                       Active Projects
                     </p>
                     <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                      {user?.activeProjects || 0}
+                      {stats.activeJobs}
                     </p>
                   </div>
                 </div>
@@ -81,7 +105,7 @@ const ProfilePage = () => {
                       Total Earnings
                     </p>
                     <p className="text-2xl font-bold text-secondary-900 dark:text-white">
-                      ${user?.totalEarnings || 0}
+                      ₹{stats.totalEarnings}
                     </p>
                   </div>
                 </div>

@@ -33,13 +33,27 @@ export const loginUser = createAsyncThunk(
   'auth/login',
   async (userData, thunkAPI) => {
     try {
+      console.log('Attempting login with:', {...userData, password: '********'});
       const response = await api.post('/auth/login', userData);
+      console.log('Login response:', response.data);
+      
       if (response.data) {
-        localStorage.setItem('user', JSON.stringify(response.data));
+        // Make sure to properly structure the data before storing
+        const dataToStore = {
+          ...response.data,
+          // If the user data isn't at the top level but nested
+          user: response.data.user || response.data
+        };
+        
+        console.log('Storing in localStorage:', dataToStore);
+        localStorage.setItem('user', JSON.stringify(dataToStore));
+        return dataToStore;
       }
       return response.data;
     } catch (error) {
+      console.error('Login error details:', error);
       const message = error.response?.data?.message || error.message || 'Login failed';
+      console.log('Returning error message:', message);
       return thunkAPI.rejectWithValue(message);
     }
   }

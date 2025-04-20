@@ -20,28 +20,89 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isLoading, isAuthenticated, error } = useSelector(state => state.auth);
+  const [localError, setLocalError] = useState(null);
+  const [debugInfo, setDebugInfo] = useState(null);
 
   useEffect(() => {
+    // Debug auth state on mount
+    console.log('Auth state on LoginPage mount:', { user, isAuthenticated, error });
+    
     // If already logged in, redirect to dashboard
-    if (isAuthenticated) {
+    if (isAuthenticated && user) {
+      console.log("User already authenticated, redirecting to dashboard", user);
       navigate('/dashboard');
+    }
+    
+    // Check if there's anything in localStorage
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        console.log("Found user data in localStorage:", parsedUser);
+        setDebugInfo(prev => ({ ...prev, localStorage: 'User data found' }));
+      } catch (e) {
+        console.error("Error parsing user data from localStorage:", e);
+        setDebugInfo(prev => ({ ...prev, localStorage: 'Invalid JSON in localStorage' }));
+      }
+    } else {
+      console.log("No user data found in localStorage");
+      setDebugInfo(prev => ({ ...prev, localStorage: 'No user data found' }));
     }
 
     // Reset auth state on component unmount
     return () => {
       dispatch(reset());
     };
-  }, [isAuthenticated, navigate, dispatch]);
+  }, [isAuthenticated, user, navigate, dispatch]);
 
   useEffect(() => {
     // Show error toast if login fails
     if (error) {
+      setLocalError(error);
       toast.error(error);
+      setDebugInfo(prev => ({ ...prev, lastError: error }));
     }
   }, [error]);
 
-  const handleSubmit = (values) => {
-    dispatch(loginUser(values));
+  const handleSubmit = async (values, { setSubmitting }) => {
+    setLocalError(null);
+    setDebugInfo(prev => ({ ...prev, attemptedLogin: true, credentials: { email: values.email, passwordLength: values.password.length } }));
+    
+    try {
+      console.log("Attempting login with:", values.email);
+      
+      // First, try to make a simple API test call to verify connectivity
+      try {
+        const testResponse = await fetch('http://localhost:5000/api');
+        setDebugInfo(prev => ({ 
+          ...prev, 
+          apiTest: testResponse.ok ? 'Success' : `Failed with status ${testResponse.status}` 
+        }));
+      } catch (testError) {
+        console.error("API connectivity test failed:", testError);
+        setDebugInfo(prev => ({ ...prev, apiTest: `Connection failed: ${testError.message}` }));
+      }
+      
+      // Now attempt the actual login
+      const result = await dispatch(loginUser(values)).unwrap();
+      console.log("Login result:", result);
+      
+      if (result && (result.success || result.token)) {
+        toast.success("Login successful!");
+        setDebugInfo(prev => ({ ...prev, loginResult: 'Success', user: result }));
+        navigate('/dashboard');
+      } else {
+        setLocalError("Login response didn't contain success status or token");
+        setDebugInfo(prev => ({ ...prev, loginResult: 'Invalid response format', response: result }));
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setLocalError(typeof error === 'string' ? error : 'Login failed. Please check console for details.');
+      setDebugInfo(prev => ({ ...prev, loginResult: 'Error', error: error.toString() }));
+      toast.error(typeof error === 'string' ? error : 'Login failed');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -65,6 +126,12 @@ const LoginPage = () => {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white dark:bg-secondary-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          {localError && (
+            <div className="mb-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-3 rounded-md text-sm">
+              {localError}
+            </div>
+          )}
+          
           <Formik
             initialValues={{ email: '', password: '' }}
             validationSchema={LoginSchema}
